@@ -1,0 +1,47 @@
+def dfs(visited, graph, node):
+    if node not in visited:
+        print(node, end=" ")
+        visited.add(node)
+        for neighbour in graph[node]:
+            dfs(visited, graph, neighbour)
+
+
+def bfs(visited, graph, node):
+    queue = []
+
+    visited.add(node)
+    queue.append(node)
+
+    while queue:
+        s = queue.pop(0)
+        print(s, end=" ")
+
+        for neighbour in graph[s]:
+            if neighbour not in visited:
+                visited.add(neighbour)
+                queue.append(neighbour)
+
+
+def main():
+    # Given graph (adjacency list)
+    graph = {
+        1: [2, 3],
+        2: [4, 5],
+        3: [6],
+        4: [],
+        5: [],
+        6: []
+    }
+
+    visited1 = set()
+    visited2 = set()
+
+    print("DFS Traversal:")
+    dfs(visited1, graph, 1)
+
+    print("\nBFS Traversal:")
+    bfs(visited2, graph, 1)
+
+
+if __name__ == "__main__":
+    main()

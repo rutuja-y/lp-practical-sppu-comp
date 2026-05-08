@@ -1,0 +1,246 @@
+/----Selection sort-------/
+def selectionSort(arr):
+    n = len(arr)
+
+    for i in range(n):
+        min_idx = i
+        for j in range(i+1, n):
+            if arr[j] < arr[min_idx]:
+                min_idx = j
+
+        # Swap the found minimum element with the first element
+        arr[i], arr[min_idx] = arr[min_idx], arr[i]
+
+    return arr
+
+# Main function
+if __name__ == '__main__':
+    arr = list(map(int, input("Enter the elements separated by space: ").split()))
+    print("Original array:", arr)
+    sorted_arr = selectionSort(arr)
+    print("Sorted array:", sorted_arr)
+
+
+/------ Kruskal algorithm -------/
+class UnionFind:
+    def __init__(self, vertices):
+        # parent and rank dictionaries
+        self.parent = {}
+        self.rank = {}
+
+        # initially every vertex is its own parent
+        for v in vertices:
+            self.parent[v] = v
+            self.rank[v] = 0
+
+    def find(self, x):
+        # path compression
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])
+        return self.parent[x]
+
+    def union(self, x, y):
+        px = self.find(x)
+        py = self.find(y)
+
+        # already in same set
+        if px == py:
+            return False
+
+        # union by rank
+        if self.rank[px] < self.rank[py]:
+            self.parent[px] = py
+        elif self.rank[px] > self.rank[py]:
+            self.parent[py] = px
+        else:
+            self.parent[py] = px
+            self.rank[px] += 1
+
+        return True
+
+
+def kruskal(edges):
+    # collect all vertices
+    vertices = set()
+
+    for u, v, w in edges:
+        vertices.add(u)
+        vertices.add(v)
+
+    # create UnionFind
+    uf = UnionFind(vertices)
+
+    # sort edges by weight
+    edges.sort(key=lambda x: x[2])
+
+    cost = 0
+    mst = []
+
+    # process edges
+    for u, v, w in edges:
+        if uf.union(u, v):
+            mst.append((u, v, w))
+            cost += w
+
+    return mst, cost
+
+
+# INPUT EDGES (Alphabet vertices)
+edges = [
+    ('A', 'B', 10),
+    ('A', 'C', 6),
+    ('A', 'D', 5),
+    ('B', 'D', 15),
+    ('C', 'D', 4)
+]
+
+# Run Kruskal
+mst, cost = kruskal(edges)
+
+# Output
+print("Minimum Spanning Tree:")
+for edge in mst:
+    print(edge)
+
+print("Total Cost:", cost)
+
+
+
+/------ prims algorithm -------/
+import heapq
+
+def prim(graph, start):
+    visited = set()
+
+    # (weight, current_node, parent)
+    min_heap = [(0, start, None)]
+
+    mst = []
+    total_cost = 0
+
+    while min_heap:
+        weight, node, parent = heapq.heappop(min_heap)
+
+        if node in visited:
+            continue
+
+        visited.add(node)
+        total_cost += weight
+
+        if parent is not None:
+            mst.append((parent, node, weight))
+
+        for neighbor, cost in graph[node]:
+            if neighbor not in visited:
+                heapq.heappush(min_heap, (cost, neighbor, node))
+
+    return mst, total_cost
+
+
+graph = {
+    'A': [('B',2), ('C',6), ('D',3)],
+    'B': [('A',2), ('D',8)],
+    'C': [('A',6), ('D',5)],
+    'D': [('A',3), ('B',8), ('C',5)]
+}
+
+mst, cost = prim(graph, 'A')
+
+print("MST Edges:")
+for u, v, w in mst:
+    print(u, "-", v, "=", w)
+
+print("Total Cost:", cost)
+
+
+/--- Dijkstra algorithm ----/
+import heapq
+
+
+def dijkstra(graph, start):
+    # store shortest distance to each node
+    dist = {node: float('inf') for node in graph}
+
+    # starting node distance = 0
+    dist[start] = 0
+
+    # min heap (distance, node)
+    heap = [(0, start)]
+
+    while heap:
+        d, node = heapq.heappop(heap)
+
+        # skip outdated heap entry
+        if d > dist[node]:
+            continue
+
+        # check neighbors
+        for neighbor, weight in graph[node]:
+            new_dist = d + weight
+
+            # if shorter path found
+            if new_dist < dist[neighbor]:
+                dist[neighbor] = new_dist
+                heapq.heappush(heap, (new_dist, neighbor))
+
+    return dist
+
+
+# Graph input
+graph = {
+    'A': [('B', 1), ('C', 4)],
+    'B': [('A', 1), ('C', 2), ('D', 5)],
+    'C': [('A', 4), ('B', 2), ('D', 1)],
+    'D': [('B', 5), ('C', 1)]
+}
+
+# Start node
+start = 'A'
+
+# Run algorithm
+result = dijkstra(graph, start)
+
+# Print shortest distances
+print("Shortest distances from", start)
+
+for node in result:
+    print(start, "->", node, "=", result[node])
+
+
+
+
+
+/----job scheduling-------/
+def job_scheduling(jobs):
+    # jobs = (id, deadline, profit)
+
+    jobs.sort(key=lambda x: x[2], reverse=True)
+
+    max_deadline = max(job[1] for job in jobs)
+    slots = [None] * max_deadline
+
+    total_profit = 0
+
+    for job_id, deadline, profit in jobs:
+        # latest possible slot
+        for j in range(deadline - 1, -1, -1):
+            if slots[j] is None:
+                slots[j] = job_id
+                total_profit += profit
+                break
+
+    return slots, total_profit
+
+
+jobs = [
+    ('A', 2, 100),
+    ('B', 1, 19),
+    ('C', 2, 27),
+    ('D', 1, 25),
+    ('E', 3, 15)
+]
+
+schedule, profit = job_scheduling(jobs)
+
+print("Schedule:", schedule)
+print("Profit:", profit)
