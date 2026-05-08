@@ -1,0 +1,32 @@
+# Assignment: DES Encryption and Decryption
+# Aim: To implement DES encryption and decryption
+
+from Crypto.Cipher import DES
+from Crypto.Util.Padding import pad, unpad
+
+# 8-byte secret key
+key = b"ABCDEFGH"
+
+# Create DES cipher in ECB mode
+cipher = DES.new(key, DES.MODE_ECB)
+
+# Input plaintext
+plaintext = input("Enter Plain Text: ").encode()
+
+# Padding plaintext to multiple of 8 bytes
+padded_text = pad(plaintext, 8)
+
+# Encryption
+encrypted_text = cipher.encrypt(padded_text)
+
+# Display encrypted text
+print("Encrypted Text:", encrypted_text)
+
+# Decryption
+decrypted_padded = cipher.decrypt(encrypted_text)
+
+# Remove padding
+decrypted_text = unpad(decrypted_padded, 8)
+
+# Display decrypted text
+print("Decrypted Text:", decrypted_text.decode())

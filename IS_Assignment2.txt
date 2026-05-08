@@ -1,0 +1,82 @@
+# Columnar Transposition Cipher (Simple Version)
+
+# ---------------- ENCRYPTION ----------------
+def encryptMessage(msg, key):
+    col = len(key)
+    row = (len(msg) + col - 1) // col
+
+    # convert message to list
+    msg_lst = list(msg)
+
+    # padding with '_'
+    while len(msg_lst) < row * col:
+        msg_lst.append('_')
+
+    # create matrix (row-wise filling)
+    matrix = []
+    k = 0
+
+    for i in range(row):
+        temp = []
+        for j in range(col):
+            temp.append(msg_lst[k])
+            k += 1
+        matrix.append(temp)
+
+    # read column-wise using key order
+    cipher = ""
+    key_order = sorted(list(key))
+
+    for ch in key_order:
+        col_index = key.index(ch)
+
+        for i in range(row):
+            cipher += matrix[i][col_index]
+
+    return cipher
+
+
+# ---------------- DECRYPTION ----------------
+def decryptMessage(cipher, key):
+    col = len(key)
+    row = (len(cipher) + col - 1) // col
+
+    # empty matrix
+    matrix = []
+    for i in range(row):
+        temp = []
+        for j in range(col):
+            temp.append('')
+        matrix.append(temp)
+
+    key_order = sorted(list(key))
+    k = 0
+
+    # fill column-wise
+    for ch in key_order:
+        col_index = key.index(ch)
+
+        for i in range(row):
+            matrix[i][col_index] = cipher[k]
+            k += 1
+
+    # read row-wise
+    msg = ""
+    for i in range(row):
+        for j in range(col):
+            msg += matrix[i][j]
+
+    return msg.replace('_', '')
+
+
+# ---------------- MAIN PROGRAM ----------------
+print("=== Columnar Transposition Cipher ===")
+
+msg = input("Enter message: ")
+key = input("Enter key: ")
+
+encrypted = encryptMessage(msg, key)
+print("Encrypted Message:", encrypted)
+
+decrypted = decryptMessage(encrypted, key)
+print("Decrypted Message:", decrypted)

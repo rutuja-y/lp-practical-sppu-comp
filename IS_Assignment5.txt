@@ -1,0 +1,72 @@
+# Assignment No. 5: RSA Encryption and Decryption
+# Aim: To implement RSA encryption and decryption (Manual RSA)
+
+# Function to calculate gcd
+def gcd(a, b):
+    while b != 0:
+        a, b = b, a % b
+    return a
+
+# Function for (base^expo) % m
+def power(base, expo, m):
+    res = 1
+    base = base % m
+
+    while expo > 0:
+        if expo & 1:
+            res = (res * base) % m
+
+        base = (base * base) % m
+        expo = expo // 2
+
+    return res
+
+# Function to find modular inverse
+def modInverse(e, phi):
+    for d in range(2, phi):
+        if (e * d) % phi == 1:
+            return d
+    return -1
+
+# RSA Key Generation
+def generateKeys():
+    p = 7919
+    q = 1009
+
+    n = p * q
+    phi = (p - 1) * (q - 1)
+
+    # Choose e
+    for e in range(2, phi):
+        if gcd(e, phi) == 1:
+            break
+
+    # Find d
+    d = modInverse(e, phi)
+
+    return e, d, n
+
+# Encryption
+def encrypt(m, e, n):
+    return power(m, e, n)
+
+# Decryption
+def decrypt(c, d, n):
+    return power(c, d, n)
+
+# Main Program
+e, d, n = generateKeys()
+
+print("Public Key (e, n):", (e, n))
+print("Private Key (d, n):", (d, n))
+
+# Input message
+M = int(input("Enter Message: "))
+
+# Encrypt
+C = encrypt(M, e, n)
+print("Encrypted Message:", C)
+
+# Decrypt
+P = decrypt(C, d, n)
+print("Decrypted Message:", P)

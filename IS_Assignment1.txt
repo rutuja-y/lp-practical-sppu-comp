@@ -1,0 +1,29 @@
+# Assignment No. 1: Bitwise AND and XOR on String Characters
+
+# Start the program
+s = input("Enter a string: ")
+
+# Display original string
+print("Original String:", s)
+
+# Initialize empty strings
+and_result = ""
+xor_result = ""
+
+# Traverse each character
+for c in s:
+    ascii_value = ord(c)   # Convert character to ASCII value
+    
+    # Bitwise AND with 127
+    and_char = chr(ascii_value & 127)
+    and_result += and_char
+    
+    # Bitwise XOR with 127
+    xor_char = chr(ascii_value ^ 127)
+    xor_result += xor_char
+
+# Display results
+print("After AND with 127 :", and_result)
+print("After XOR with 127 :", xor_result)
+
+# Stop the program
